@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "DeepSeek 余额",
+    "description": "在侧栏底部显示 DeepSeek 账户余额，用已配置的 API Key 读取；设置与登录就在同一张卡片上。",
+    "detail": "docs/DETAIL.md"
+  }
+}

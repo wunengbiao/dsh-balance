@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "DeepSeek balance",
+    "description": "Shows the DeepSeek account balance in the sidebar foot, read with the configured API key, with Settings and sign-in on the same card.",
+    "detail": "docs/DETAIL.md"
+  }
+}

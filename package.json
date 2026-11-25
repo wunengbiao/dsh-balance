@@ -1,0 +1,61 @@
+{
+  "name": "dsh-balance",
+  "version": "1.0.0",
+  "description": "DeepSeek balance card for the DSH sidebar foot, read with the configured API key.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "balance",
+    "deepseek"
+  ],
+  "engines": {
+    "dsh": ">=0.2.2-rc.5"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "icon": "icon.svg",
+  "license": "MIT",
+  "author": "wunengbiao",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wunengbiao/dsh-balance.git"
+  },
+  "homepage": "https://github.com/wunengbiao/dsh-balance#readme",
+  "bugs": {
+    "url": "https://github.com/wunengbiao/dsh-balance/issues"
+  },
+  "scripts": {
+    "test": "node test/wiring.mjs",
+    "check": "node --check index.js && node --check client.js && node --check lib/balance.js && node --check lib/routes.js"
+  }
+}

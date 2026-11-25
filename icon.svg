@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Balance card">
+  <rect x="0" y="0" width="64" height="64" rx="14" fill="#0F1115"/>
+  <rect x="10" y="20" width="44" height="27" rx="7" fill="none" stroke="#F9FAFB" stroke-width="3.2"/>
+  <path d="M10 29.5h44" stroke="#F9FAFB" stroke-width="3.2" stroke-linecap="round" opacity="0.55"/>
+  <circle cx="44.5" cy="38" r="3.4" fill="#5686FE"/>
+  <circle cx="22" cy="38" r="3.4" fill="#F9FAFB" opacity="0.5"/>
+</svg>

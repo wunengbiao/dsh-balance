@@ -1,0 +1,6 @@
+# dsh-balance bundle layer.
+# Host: resolves DEEPSEEK_API_KEY, reads /user/balance, serves /dsh-balance/balance.
+# Client: takes over the settings.launcher row (the former "··· More" launcher).
+- insert:
+    - id: dsh-balance
+      name: dsh-balance
