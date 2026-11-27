@@ -317,3 +317,10 @@ dsh-balance/
 
 实测：eyebrow 文本 `BALANCE · 余额`、hero 26px、底部工具四项、模式文本两个且 active 正确、
 点「写代码」转发到源按钮（click 间谍 `forwarded: true`）；浅色与暗色各一张。
+
+
+## 第十一轮：模式改回按键
+
+用户要求「对话和代码采用按键切换模式」。文字斜杠开关改成胶囊里的两个图标按键
+（24×18、`border-l2` 药丸外框、激活 `bg-skeleton` + `label-primary`），仍在同一行右侧，
+工具组不变。实测转发仍为 `forwarded: true`。

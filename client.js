@@ -137,12 +137,14 @@ window.__ModuleLoader__.load({
       'color:var(--dsw-alias-label-secondary)}',
       '.dshb-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;',
       'border-top:1px solid var(--dsw-alias-border-l1)}',
-      '.dshb-modes{display:inline-flex;align-items:center;gap:3px;flex:none}',
-      '.dshb-modes button{border:0;background:none;padding:1px 2px;font:inherit;font-size:11px;font-weight:500;',
-      'color:var(--dsw-alias-label-tertiary,rgb(151,157,166));cursor:pointer}',
-      '.dshb-modes button[data-active="true"]{color:var(--dsw-alias-label-primary);font-weight:600}',
-      '.dshb-modes button:hover:not([data-active="true"]){color:var(--dsw-alias-label-secondary)}',
-      '.dshb-modes .sep{color:var(--dsw-alias-border-l2);font-size:11px}',
+      '.dshb-modes{display:inline-flex;align-items:center;gap:2px;padding:2px;flex:none;',
+      'border:1px solid var(--dsw-alias-border-l2);border-radius:999px}',
+      '.dshb-modes button{display:inline-flex;align-items:center;justify-content:center;width:24px;height:18px;padding:0;border:0;',
+      'border-radius:999px;background:transparent;color:var(--dsw-alias-label-tertiary,rgb(151,157,166));cursor:pointer}',
+      '.dshb-modes button[data-active="true"]{background:var(--dsw-alias-bg-skeleton,rgba(127,127,127,.18));',
+      'color:var(--dsw-alias-label-primary)}',
+      '.dshb-modes button:hover:not([data-active="true"]){background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));',
+      'color:var(--dsw-alias-label-secondary)}',
       '.dshb-tools{display:flex;align-items:center;gap:2px;margin-right:-5px;flex:none}',
       // Chat/code switch: a full-width segmented bar at the foot of the card, so
       // it reads as a mode selector instead of two tiny glyphs.
@@ -556,20 +558,19 @@ window.__ModuleLoader__.load({
           if (target !== undefined) target.click()
         }
 
-        // In this layout the mode is a quiet text toggle on the hairline row.
+        // Two icon buttons in a pill: the mode is a switch, not a label.
         const modeControl = hasMode
           ? h('span', { className: 'dshb-modes', role: 'group', 'aria-label': tr('modeGroup') },
             h('button', {
               type: 'button', title: tr('modeChat'), 'aria-label': tr('modeChat'),
               'data-active': mode === 'chat' ? 'true' : 'false',
               onClick: () => chooseMode(0),
-            }, tr('modeChatLabel')),
-            h('span', { className: 'sep' }, '/'),
+            }, h(ChatGlyph)),
             h('button', {
               type: 'button', title: tr('modeCode'), 'aria-label': tr('modeCode'),
               'data-active': mode === 'code' ? 'true' : 'false',
               onClick: () => chooseMode(1),
-            }, tr('modeCodeLabel')))
+            }, h(CodeGlyph)))
           : null
 
         const targetScheme = scheme === 'dark' ? 'light' : 'dark'
