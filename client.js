@@ -84,6 +84,7 @@ window.__ModuleLoader__.load({
       modeChatLabel: '对话',
       modeCodeLabel: '写代码',
       modeGroup: '输入模式',
+      eyebrow: 'BALANCE · 余额',
     }
     const en = {
       balance: 'Balance',
@@ -109,6 +110,7 @@ window.__ModuleLoader__.load({
       modeChatLabel: 'Chat',
       modeCodeLabel: 'Code',
       modeGroup: 'Composer mode',
+      eyebrow: 'BALANCE',
     }
 
     /** Base stylesheet; the panel-list override is appended only when this plugin can replace it. */
@@ -124,7 +126,23 @@ window.__ModuleLoader__.load({
       'color:var(--dsw-alias-label-primary);font:inherit;text-align:start}',
       'body[data-ds-dark-theme] .dshb-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.32)}',
       '.dshb-top{display:flex;align-items:center;justify-content:space-between;min-height:22px;gap:6px}',
-      '.dshb-cap{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden}',
+      '.dshb-cap{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.12em;',
+      'text-transform:uppercase;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden}',
+      // Magazine hero: the number carries the card, everything else is a hairline apart.
+      '.dshb-hero{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:2px;',
+      'font-size:26px;font-weight:620;letter-spacing:-.025em;line-height:1.16;',
+      'font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary)}',
+      '.dshb-hero[data-warn="true"]{color:var(--dsw-alias-state-warn-primary)}',
+      '.dshb-hero[data-muted="true"]{font-size:13px;font-weight:550;letter-spacing:0;line-height:1.6;',
+      'color:var(--dsw-alias-label-secondary)}',
+      '.dshb-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;',
+      'border-top:1px solid var(--dsw-alias-border-l1)}',
+      '.dshb-modes{display:inline-flex;align-items:center;gap:3px;flex:none}',
+      '.dshb-modes button{border:0;background:none;padding:1px 2px;font:inherit;font-size:11px;font-weight:500;',
+      'color:var(--dsw-alias-label-tertiary,rgb(151,157,166));cursor:pointer}',
+      '.dshb-modes button[data-active="true"]{color:var(--dsw-alias-label-primary);font-weight:600}',
+      '.dshb-modes button:hover:not([data-active="true"]){color:var(--dsw-alias-label-secondary)}',
+      '.dshb-modes .sep{color:var(--dsw-alias-border-l2);font-size:11px}',
       '.dshb-tools{display:flex;align-items:center;gap:2px;margin-right:-5px;flex:none}',
       // Chat/code switch: a full-width segmented bar at the foot of the card, so
       // it reads as a mode selector instead of two tiny glyphs.
@@ -461,7 +479,7 @@ window.__ModuleLoader__.load({
 
         const caption = h('span', { className: 'dshb-cap' },
           h('span', { className: 'dshb-dot', 'data-warn': low || failed ? 'true' : 'false' }),
-          tr('balance'))
+          tr('eyebrow'))
 
         // `pluginNavigation` is the plugin manager's own entry point: it selects
         // the Plugins panel and resets it to the Installed list. The layout
@@ -538,18 +556,20 @@ window.__ModuleLoader__.load({
           if (target !== undefined) target.click()
         }
 
+        // In this layout the mode is a quiet text toggle on the hairline row.
         const modeControl = hasMode
-          ? h('div', { className: 'dshb-mode', role: 'group', 'aria-label': tr('modeGroup') },
+          ? h('span', { className: 'dshb-modes', role: 'group', 'aria-label': tr('modeGroup') },
             h('button', {
               type: 'button', title: tr('modeChat'), 'aria-label': tr('modeChat'),
               'data-active': mode === 'chat' ? 'true' : 'false',
               onClick: () => chooseMode(0),
-            }, h(ChatGlyph), h('span', null, tr('modeChatLabel'))),
+            }, tr('modeChatLabel')),
+            h('span', { className: 'sep' }, '/'),
             h('button', {
               type: 'button', title: tr('modeCode'), 'aria-label': tr('modeCode'),
               'data-active': mode === 'code' ? 'true' : 'false',
               onClick: () => chooseMode(1),
-            }, h(CodeGlyph), h('span', null, tr('modeCodeLabel'))))
+            }, tr('modeCodeLabel')))
           : null
 
         const targetScheme = scheme === 'dark' ? 'light' : 'dark'
@@ -622,20 +642,20 @@ window.__ModuleLoader__.load({
         }
 
         const muted = loading || missingKey || shown === undefined
-        const body = h('div', {
-          className: 'dshb-value',
+        const hero = h('div', {
+          className: 'dshb-hero',
           'data-muted': muted ? 'true' : 'false',
           'data-warn': !muted && low ? 'true' : 'false',
-        }, leading, moreControl)
+        }, leading)
 
         return h('div', { className: 'dshb-root' },
           h('style', null, css),
           h('div', { className: 'dshb-card' },
-            h('div', { className: 'dshb-top' },
-              caption,
-              h('span', { className: 'dshb-tools' }, importButton, pluginsButton, themeButton, gear)),
-            body,
-            modeControl))
+            h('div', { className: 'dshb-top' }, caption, h('span', { className: 'dshb-tools' }, gear)),
+            hero,
+            h('div', { className: 'dshb-foot' },
+              h('span', { className: 'dshb-tools' }, importButton, pluginsButton, themeButton, moreControl),
+              modeControl)))
       }
     }
 

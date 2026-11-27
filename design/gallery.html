@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>dsh-balance · 卡片 10 种排版</title>
+<style>
+  :root{
+    --font:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    --sidebar:#f9fafb; --card-a:#ffffff; --card-b:#f9fafb;
+    --b1:rgba(0,0,0,.06); --b2:rgba(0,0,0,.10); --b3:rgba(0,0,0,.16);
+    --t1:#0f1115; --t2:#61666b; --t3:#97999e;
+    --accent:#5686fe; --accent-ink:#416ee6; --success:#22c55e; --warn:#f59e0b;
+    --sk:rgba(15,17,21,.07); --hover:rgba(0,0,0,.05);
+    --page:#ffffff; --doc:#0f1115; --mute:#61666b; --faint:#97999e;
+  }
+  .dark{
+    --sidebar:#1b1b1c; --card-a:#232324; --card-b:#1b1b1c;
+    --b1:rgba(255,255,255,.06); --b2:rgba(255,255,255,.12); --b3:rgba(255,255,255,.20);
+    --t1:#f9fafb; --t2:#cfd3d6; --t3:#97999e;
+    --accent:#5686fe; --accent-ink:#78a3ff; --sk:rgba(255,255,255,.10); --hover:rgba(255,255,255,.07);
+    --page:#151517; --doc:#f9fafb; --mute:#aeb4bc; --faint:#81858c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--font);background:var(--page);color:var(--doc);-webkit-font-smoothing:antialiased}
+  .sheet{padding:36px 40px 44px;width:max-content}
+  h1{font-size:22px;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{font-size:12.5px;color:var(--mute);margin:0 0 26px;line-height:1.6;max-width:900px}
+  .grid{display:grid;grid-template-columns:repeat(5,200px);gap:22px}
+  .cell{display:flex;flex-direction:column;gap:8px}
+  .tag{font-size:11px;font-weight:600;color:var(--mute);display:flex;justify-content:space-between}
+  .tag b{color:var(--doc);font-weight:600}
+  .tag i{font-style:normal;color:var(--faint);font-weight:500}
+
+  /* sidebar frame */
+  .sb{width:200px;background:var(--sidebar);border:1px solid var(--b2);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:2px;min-height:132px}
+  .sb .rows{margin-top:auto;display:flex;flex-direction:column;gap:0}
+  .row{display:flex;align-items:center;gap:5px;height:22px;padding:0 5px;font-size:10px;color:var(--t2);border-radius:5px}
+  .row span:last-child{margin-left:auto;font-size:9px;color:var(--t3)}
+
+  /* card shell */
+  .card{width:188px;border:1px solid var(--b2);border-radius:11px;overflow:hidden;color:var(--t1);
+        background:linear-gradient(180deg,var(--card-a) 0%,var(--card-b) 100%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 1px 2px rgba(15,17,21,.05);}
+  .dark .card{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.32)}
+  .pad{padding:8px 9px 9px}
+  .lab{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:.02em;color:var(--t2)}
+  .dot{width:4px;height:4px;border-radius:50%;background:var(--success)}
+  .num{font-variant-numeric:tabular-nums;letter-spacing:-.02em;font-weight:620;line-height:1.2}
+  .v19{font-size:17px} .v24{font-size:21px} .v28{font-size:24px} .v32{font-size:28px}
+  .tools{display:inline-flex;align-items:center;gap:1px}
+  .ico{width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--t3)}
+  .ico.on{color:var(--t2)}
+  .ico.box{background:var(--sk);color:var(--t1)}
+  .ico.round{border-radius:999px;border:1px solid var(--b2)}
+  .seg{display:flex;gap:2px;padding:2px;border:1px solid var(--b2);border-radius:8px}
+  .seg button{flex:1;min-width:0;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:4px;height:22px;border:0;border-radius:6px;
+              background:transparent;font:inherit;font-size:10px;font-weight:500;color:var(--t2)}
+  .seg button.on{background:var(--sk);color:var(--t1);font-weight:600}
+  .seg.pill{border-radius:999px}
+  .seg.pill button{border-radius:999px}
+  .seg.sm button{height:18px;font-size:9.5px}
+  .line{height:1px;background:var(--b1);margin:7px 0}
+  .pillbar{display:flex;align-items:center;gap:1px;padding:2px;border-radius:999px;border:1px solid var(--b2)}
+  .pillbar .ico{border-radius:999px}
+
+  /* variants */
+  .two{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .col{display:flex;flex-direction:column}
+  .side{display:flex;flex-direction:column;gap:3px;align-items:center}
+  .brand{background:linear-gradient(155deg,rgba(86,134,254,.20),rgba(86,134,254,.05) 58%,transparent),linear-gradient(180deg,var(--card-a),var(--card-b));
+         border-color:rgba(86,134,254,.38)}
+  .dark .brand{background:linear-gradient(150deg,rgba(86,134,254,.22),rgba(86,134,254,.06) 60%,transparent),linear-gradient(180deg,var(--card-a),var(--card-b))}
+  .glass{background:linear-gradient(180deg,color-mix(in srgb,var(--card-a) 86%,transparent),color-mix(in srgb,var(--card-a) 58%,transparent));
+         border:1px solid var(--b3);
+         box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 0 0 1px rgba(255,255,255,.18),0 2px 10px rgba(15,17,21,.06)}
+  .dark .glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 0 0 1px rgba(255,255,255,.05),0 2px 10px rgba(0,0,0,.28)}
+  .float{position:relative}
+  .floattools{position:absolute;right:8px;top:0;display:flex;gap:2px;padding:2px;border-radius:999px;
+              background:var(--card-a);border:1px solid var(--b2);box-shadow:0 2px 8px rgba(15,17,21,.10)}
+  .tabs{display:flex;gap:10px;font-size:10px;font-weight:600;color:var(--t3)}
+  .tabs b{color:var(--t1);font-weight:600;position:relative}
+  .tabs b::after{content:'';position:absolute;left:0;right:0;bottom:-5px;height:2px;border-radius:2px;background:var(--t1)}
+  .mini{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--t3)}
+</style>
+</head>
+<body>
+<div class="sheet" id="light">
+  <h1>dsh-balance · 卡片 10 种排版</h1>
+  <p class="sub">同一套 DSH token、同一份数据（余额 / 对话·写代码模式 / 导入·插件·主题·设置·更多），只换排版策略。每个都在真实 280px 侧栏宽度里、带一行会话列表做上下参照。</p>
+  <div class="grid" id="grid-light"></div>
+</div>
+
+<script>
+const ICONS = {
+  import: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"><path d="M8 2.4v7.2M5.4 5 8 2.4 10.6 5"/><path d="M3.2 9.6v2.3a1.3 1.3 0 0 0 1.3 1.3h7a1.3 1.3 0 0 0 1.3-1.3V9.6"/></svg>',
+  plugin: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="5.8" cy="5.8" r="2.3" stroke="currentColor" stroke-width="1.3"/><circle cx="10.2" cy="5.8" r="2.3" stroke="currentColor" stroke-width="1.3"/><circle cx="5.8" cy="10.2" r="2.3" stroke="currentColor" stroke-width="1.3"/><circle cx="10.2" cy="10.2" r="2.3" stroke="currentColor" stroke-width="1.3"/></svg>',
+  theme: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.6v1.4M8 13v1.4M1.6 8h1.4M13 8h1.4M3.5 3.5l1 1M11.5 11.5l1 1M12.5 3.5l-1 1M4.5 11.5l-1 1"/></svg>',
+  gear: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.4" stroke="currentColor" stroke-width="1.9"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12.6 8h1.2M3.4 8H2.2M8 12.6v1.2M8 3.4V2.2M11.2 11.2l.85.85M4.8 4.8l-.85-.85M12.05 4.8l-.85.85M4.8 11.2l-.85.85"/></g></svg>',
+  more: '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><circle cx="3.2" cy="8" r="1.15"/><circle cx="8" cy="8" r="1.15"/><circle cx="12.8" cy="8" r="1.15"/></svg>',
+  chat: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="M2.5 4.1a1.6 1.6 0 0 1 1.6-1.6h7.8a1.6 1.6 0 0 1 1.6 1.6v4.9a1.6 1.6 0 0 1-1.6 1.6H7.4L4.3 13.4v-2.8h-.2a1.6 1.6 0 0 1-1.6-1.6z"/></svg>',
+  code: '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M6.1 4.8 2.9 8l3.2 3.2M9.9 4.8 13.1 8l-3.2 3.2"/></svg>'
+}
+const ico = (name, cls = '') => `<span class="ico ${cls}">${ICONS[name]}</span>`
+const tools = (cls = '') => `<span class="tools ${cls}">${ico('import')}${ico('plugin')}${ico('theme')}${ico('gear')}</span>`
+const label = () => `<span class="lab"><span class="dot"></span>余额</span>`
+const mode = (cls = '', small = false) => `<div class="seg ${cls} ${small ? 'sm' : ''}"><button class="on">${ICONS.chat}对话</button><button>${ICONS.code}写代码</button></div>`
+
+const VARIANTS = [
+  { id: '1', name: '基线 · 三带', note: '当前这版', html: () => `
+    <div class="pad">
+      <div class="two">${label()}${tools()}</div>
+      <div class="num v24" style="margin-top:2px">¥1,146.72</div>
+      <div class="two" style="margin-top:2px">${'<span></span>'}${'<span class="tools">'+ico('more')+'</span>'}</div>
+      ${mode('', false).replace('margin', 'margin')}
+    </div>`.replace('<div class="two" style="margin-top:2px"><span></span><span class="tools">'+ICONS.more+'</span></div>', '') },
+
+  { id: '2', name: 'Hero 数字', note: '金额最大', html: () => `
+    <div class="pad">
+      <div class="two">${label()}${tools()}</div>
+      <div class="num v32" style="margin-top:6px">¥1,146.72</div>
+      <div style="margin-top:8px">${mode('pill sm')}</div>
+    </div>` },
+
+  { id: '3', name: '左右分栏', note: '工具竖排', html: () => `
+    <div class="pad" style="display:flex;gap:8px">
+      <div class="col" style="flex:1;min-width:0">
+        ${label()}
+        <div class="num v24" style="margin-top:3px">¥1,146.72</div>
+        <div style="margin-top:7px">${mode('sm')}</div>
+      </div>
+      <div class="side">${ico('import')}${ico('plugin')}${ico('theme')}${ico('gear')}${ico('more')}</div>
+    </div>` },
+
+  { id: '4', name: 'Tab 头 · 模式即标签', note: '余额/对话/写代码', html: () => `
+    <div class="pad">
+      <div class="two">
+        <span class="tabs"><b>余额</b><span>对话</span><span>写代码</span></span>
+        ${ico('gear')}
+      </div>
+      <div class="num v24" style="margin-top:8px">¥1,146.72</div>
+      <div class="line"></div>
+      <div class="two"><span class="mini">${ico('import')}${ico('plugin')}${ico('theme')}</span><span class="tools">${ico('more')}</span></div>
+    </div>` },
+
+  { id: '5', name: '极简 · 只留 ⋯', note: '工具全进菜单', html: () => `
+    <div class="pad">
+      <div class="two">${label()}<span class="tools">${ico('gear')}${ico('more')}</span></div>
+      <div class="num v24" style="margin-top:4px">¥1,146.72</div>
+      <div style="margin-top:8px">${mode('pill sm')}</div>
+    </div>` },
+
+  { id: '6', name: '胶囊工具条', note: '工具成一组', html: () => `
+    <div class="pad">
+      <div class="two">${label()}<span class="pillbar">${ico('import')}${ico('plugin')}${ico('theme')}${ico('gear')}</span></div>
+      <div class="num v24" style="margin-top:5px">¥1,146.72</div>
+      <div style="margin-top:8px">${mode('sm')}</div>
+    </div>` },
+
+  { id: '7', name: '品牌渐变', note: '带品牌蓝光', html: () => `
+    <div class="pad">
+      <div class="two">${label()}<span class="tools">${ico('gear','on')}${ico('more','on')}</span></div>
+      <div class="num v28" style="margin-top:6px">¥1,146.72</div>
+      <div style="margin-top:9px">${mode('pill sm')}</div>
+    </div>` },
+
+  { id: '8', name: '浮层工具', note: '工具骑在卡沿', html: () => `
+    <div class="float" style="padding-top:14px">
+      <div class="floattools">${ico('import')}${ico('plugin')}${ico('theme')}${ico('gear')}${ico('more')}</div>
+      <div class="pad" style="padding-top:11px">
+        ${label()}
+        <div class="num v24" style="margin-top:4px">¥1,146.72</div>
+        <div style="margin-top:8px">${mode('sm')}</div>
+      </div>
+    </div>` },
+
+  { id: '9', name: '杂志排版', note: '大数字 + 大写标签', html: () => `
+    <div class="pad">
+      <div class="two"><span class="lab" style="text-transform:uppercase;letter-spacing:.12em">BALANCE · 余额</span><span class="tools">${ico('gear')}</span></div>
+      <div class="num v32" style="margin-top:2px">¥1,146.72</div>
+      <div class="line"></div>
+      <div class="two">
+        <span class="mini">${ico('import')}${ico('plugin')}${ico('theme')}${ico('more')}</span>
+        <span class="mini" style="gap:3px"><b style="color:var(--t1);font-size:10px">对话</b><span style="color:var(--b3)">/</span><span>写代码</span></span>
+      </div>
+    </div>` },
+
+  { id: '10', name: '玻璃内光', note: '半透明 + 描边环', html: () => `
+    <div class="pad">
+      <div class="two">${label()}<span class="tools">${ico('import','round')}${ico('plugin','round')}${ico('theme','round')}${ico('gear','round')}</span></div>
+      <div class="num v24" style="margin-top:5px">¥1,146.72</div>
+      <div style="margin-top:8px">${mode('pill sm')}</div>
+    </div>` }
+]
+
+const shell = (inner, extra = '') => `
+  <div class="sb">
+    <div class="rows"><div class="row"><span>数据大屏拖拽设计系统</span><span>1 时</span></div><div class="row"><span>服务监控大屏设计</span><span>5 时</span></div></div>
+    <div class="card ${extra}">${inner}</div>
+  </div>`
+
+const grid = document.getElementById('grid-light')
+for (const v of VARIANTS) {
+  const cell = document.createElement('div')
+  cell.className = 'cell'
+  cell.innerHTML = `<div class="tag"><b>${v.id} · ${v.name}</b><i>${v.note}</i></div>${shell(v.html(), v.id === '7' ? 'brand' : v.id === '10' ? 'glass' : '')}`
+  grid.appendChild(cell)
+}
+</script>
+</body>
+</html>
