@@ -38,8 +38,17 @@ github:wunengbiao/dsh-balance#v1.0.0
 
 ## 表面
 
-卡片不是一块白/黑实色，而是 `layer-1 → sidebar-fill` 的竖向渐变，顶部离底、底部融进侧栏，
-配一条 `border-l2` 细描边加 1px 内高光。这样在浅色和暗色下都不会出现"贴了一块板"的割裂感。
+卡片是**品牌蓝渐变面**：一层 alpha 渐变盖在 `bg-layer-1` 上，同一份声明在浅色下是冷调薄雾、
+暗色下是深蓝罩染，不需要两套色值。
+
+```css
+background-image: linear-gradient(152deg, rgba(86,134,254,.16), rgba(86,134,254,.05) 46%, transparent);
+background-color: var(--dsw-alias-bg-layer-1);
+border: 1px solid rgba(86,134,254,.26);
+/* 暗色分支把 alpha 提到 .26 / .34，光更透、边更亮 */
+```
+
+浅色实拍 / 暗色实拍：`design/v19-light.png`、`design/v19-dark.png`。轨道态药丸用同一套渐变。
 
 ## 顶部被移走的东西
 
