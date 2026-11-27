@@ -81,6 +81,9 @@ window.__ModuleLoader__.load({
       importChats: '导入会话',
       modeChat: '对话模式',
       modeCode: '写代码模式',
+      modeChatLabel: '对话',
+      modeCodeLabel: '写代码',
+      modeGroup: '输入模式',
     }
     const en = {
       balance: 'Balance',
@@ -103,6 +106,9 @@ window.__ModuleLoader__.load({
       importChats: 'Import chats',
       modeChat: 'Chat mode',
       modeCode: 'Code mode',
+      modeChatLabel: 'Chat',
+      modeCodeLabel: 'Code',
+      modeGroup: 'Composer mode',
     }
 
     /** Base stylesheet; the panel-list override is appended only when this plugin can replace it. */
@@ -120,12 +126,17 @@ window.__ModuleLoader__.load({
       '.dshb-top{display:flex;align-items:center;justify-content:space-between;min-height:22px;gap:6px}',
       '.dshb-cap{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden}',
       '.dshb-tools{display:flex;align-items:center;gap:2px;margin-right:-5px;flex:none}',
-      // Segmented chat/code switch, mirroring the composer's own control.
-      '.dshb-mode{display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:999px;flex:none}',
-      '.dshb-mode button{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;padding:0;border:0;',
-      'border-radius:999px;background:transparent;color:var(--dsw-alias-label-tertiary,rgb(151,157,166));cursor:pointer}',
-      '.dshb-mode button[data-active="true"]{background:var(--dsw-alias-bg-skeleton,rgba(127,127,127,.18));color:var(--dsw-alias-label-primary)}',
-      '.dshb-mode button:hover:not([data-active="true"]){background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));color:var(--dsw-alias-label-secondary)}',
+      // Chat/code switch: a full-width segmented bar at the foot of the card, so
+      // it reads as a mode selector instead of two tiny glyphs.
+      '.dshb-mode{display:flex;align-items:center;gap:2px;margin-top:9px;padding:2px;',
+      'border:1px solid var(--dsw-alias-border-l2);border-radius:9px;flex:none}',
+      '.dshb-mode button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;padding:0 6px;border:0;',
+      'border-radius:7px;background:transparent;font:inherit;font-size:11.5px;font-weight:500;',
+      'color:var(--dsw-alias-label-secondary);cursor:pointer;white-space:nowrap}',
+      '.dshb-mode button[data-active="true"]{background:var(--dsw-alias-bg-skeleton,rgba(127,127,127,.18));',
+      'color:var(--dsw-alias-label-primary);font-weight:600}',
+      '.dshb-mode button:hover:not([data-active="true"]){background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));',
+      'color:var(--dsw-alias-label-primary)}',
       // The account entry shares the value row instead of joining the icon strip,
       // so the top row is always exactly three icons.
       '.dshb-account{height:20px;padding:0 5px;border:0;border-radius:6px;background:transparent;cursor:pointer;',
@@ -528,17 +539,17 @@ window.__ModuleLoader__.load({
         }
 
         const modeControl = hasMode
-          ? h('span', { className: 'dshb-mode', role: 'group' },
+          ? h('div', { className: 'dshb-mode', role: 'group', 'aria-label': tr('modeGroup') },
             h('button', {
               type: 'button', title: tr('modeChat'), 'aria-label': tr('modeChat'),
               'data-active': mode === 'chat' ? 'true' : 'false',
               onClick: () => chooseMode(0),
-            }, h(ChatGlyph)),
+            }, h(ChatGlyph), h('span', null, tr('modeChatLabel'))),
             h('button', {
               type: 'button', title: tr('modeCode'), 'aria-label': tr('modeCode'),
               'data-active': mode === 'code' ? 'true' : 'false',
               onClick: () => chooseMode(1),
-            }, h(CodeGlyph)))
+            }, h(CodeGlyph), h('span', null, tr('modeCodeLabel'))))
           : null
 
         const targetScheme = scheme === 'dark' ? 'light' : 'dark'
@@ -615,15 +626,16 @@ window.__ModuleLoader__.load({
           className: 'dshb-value',
           'data-muted': muted ? 'true' : 'false',
           'data-warn': !muted && low ? 'true' : 'false',
-        }, leading, h('span', { className: 'dshb-tail' }, importButton, pluginsButton, themeButton, moreControl))
+        }, leading, moreControl)
 
         return h('div', { className: 'dshb-root' },
           h('style', null, css),
           h('div', { className: 'dshb-card' },
             h('div', { className: 'dshb-top' },
               caption,
-              h('span', { className: 'dshb-tools' }, modeControl, gear)),
-            body))
+              h('span', { className: 'dshb-tools' }, importButton, pluginsButton, themeButton, gear)),
+            body,
+            modeControl))
       }
     }
 
