@@ -254,3 +254,27 @@ dsh-balance/
 导入插件没有对外服务（只注册了 `sidebar.session.action` 的 HOC），所以卡片是**代点它自己的触发器**：
 触发器保留在 DOM 里（`display:none`），点击时按标签找到并 `.click()`，弹窗仍由它自己管理。
 实测：点卡片上的导入图标 → 「导入 DeepSeek 会话记录」对话框正常弹出。
+
+
+---
+
+## 第七轮：模式切换进卡片 + 重排版
+
+输入框左侧那个「对话 / 写代码」分段控件来自 `dsh-plugin-chat`（`.dpc-mode > .dpc-switch > button.dpc-seg`），
+它没有对外服务，只有按钮本身触发建会话的流程。
+
+做法：`display:none` 掉 `.dpc-mode`，卡片渲染一个同语义的分段控件：
+- 状态：读 `.dpc-seg[aria-pressed="true"]` 的索引，MutationObserver 同步；
+- 点击：按索引 `.click()` 源按钮（不复制它的建会话逻辑）；
+- 插件没装（找不到 `.dpc-switch`）时不渲染这段。
+
+排版改成两段式：
+
+```
+● 余额                 💬  <>   ⚙      ← 模式 + 设置
+¥1,153.14        ⬆  ✿  ☾   ⋯         ← 金额 + 导入/插件/主题/更多
+```
+
+激活态用 `--dsw-alias-bg-skeleton` 做药丸底色（`bg-layer-2` 在浅色下是白色，等于没有）。
+实测：源控件隐藏、卡片分段存在且 `对话模式` 为 active、点击卡片 `写代码` 会转发到源按钮
+（用 click 间谍验证，没有真的触发建会话）。

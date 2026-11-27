@@ -26,6 +26,20 @@ window.__ModuleLoader__.load({
     try { slotsModule = require('@deepseek-ai/dsh-client-ui-slots') } catch (_error) { slotsModule = undefined }
 
     /**
+     * Read the composer's chat/code mode from its pressed segment.
+     * @returns {'chat' | 'code' | null} the active mode, or null when the
+     *   composer is not composed (no switch to mirror).
+     */
+    function readMode () {
+      const segments = document.querySelectorAll('.dpc-switch .dpc-seg')
+      if (segments.length < 2) return null
+      for (let index = 0; index < 2; index += 1) {
+        if (segments[index].getAttribute('aria-pressed') === 'true') return index === 0 ? 'chat' : 'code'
+      }
+      return 'chat'
+    }
+
+    /**
      * Resolve the visible label of one `sidebar.panellist` registration.
      * @param {{ options?: { label?: unknown, id?: string } }} entry - slot entry.
      * @returns {string} label text, falling back to the panel id.
@@ -65,6 +79,8 @@ window.__ModuleLoader__.load({
       themeToLight: '切换到浅色',
       themeToDark: '切换到深色',
       importChats: '导入会话',
+      modeChat: '对话模式',
+      modeCode: '写代码模式',
     }
     const en = {
       balance: 'Balance',
@@ -85,6 +101,8 @@ window.__ModuleLoader__.load({
       themeToLight: 'Switch to light',
       themeToDark: 'Switch to dark',
       importChats: 'Import chats',
+      modeChat: 'Chat mode',
+      modeCode: 'Code mode',
     }
 
     /** Base stylesheet; the panel-list override is appended only when this plugin can replace it. */
@@ -101,7 +119,13 @@ window.__ModuleLoader__.load({
       'body[data-ds-dark-theme] .dshb-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.32)}',
       '.dshb-top{display:flex;align-items:center;justify-content:space-between;min-height:22px;gap:6px}',
       '.dshb-cap{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden}',
-      '.dshb-tools{display:flex;align-items:center;gap:0;margin-right:-5px;flex:none}',
+      '.dshb-tools{display:flex;align-items:center;gap:2px;margin-right:-5px;flex:none}',
+      // Segmented chat/code switch, mirroring the composer's own control.
+      '.dshb-mode{display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:999px;flex:none}',
+      '.dshb-mode button{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;padding:0;border:0;',
+      'border-radius:999px;background:transparent;color:var(--dsw-alias-label-tertiary,rgb(151,157,166));cursor:pointer}',
+      '.dshb-mode button[data-active="true"]{background:var(--dsw-alias-bg-skeleton,rgba(127,127,127,.18));color:var(--dsw-alias-label-primary)}',
+      '.dshb-mode button:hover:not([data-active="true"]){background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));color:var(--dsw-alias-label-secondary)}',
       // The account entry shares the value row instead of joining the icon strip,
       // so the top row is always exactly three icons.
       '.dshb-account{height:20px;padding:0 5px;border:0;border-radius:6px;background:transparent;cursor:pointer;',
@@ -176,6 +200,9 @@ window.__ModuleLoader__.load({
       // Every panel entry now lives in this card's panel menu, so the panel
       // navigation list is empty space above the workspaces; drop it and keep
       // the brand row tight against the workspace header.
+      // The composer's chat/code switch moves onto this card.
+      ':root:has(.dshb-card) .dpc-mode',
+      '{display:none!important}',
       ':root:has(.dshb-card) [data-sidebar-scrollport] nav',
       '{display:none}',
 
@@ -257,6 +284,18 @@ window.__ModuleLoader__.load({
       dashed ? null : h('circle', { cx: 11.2, cy: 8.1, r: 1.05, fill: 'currentColor' }))
     }
 
+    /** Chat-mode glyph (speech bubble). */
+    function ChatGlyph () {
+      return h('svg', { width: 12, height: 12, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinejoin: 'round', 'aria-hidden': true },
+        h('path', { d: 'M2.4 4.1a1.7 1.7 0 0 1 1.7-1.7h7.8a1.7 1.7 0 0 1 1.7 1.7v5a1.7 1.7 0 0 1-1.7 1.7H7.4L4.2 13.6v-2.8h-.1a1.7 1.7 0 0 1-1.7-1.7z' }))
+    }
+
+    /** Code-mode glyph (angle brackets). */
+    function CodeGlyph () {
+      return h('svg', { width: 12, height: 12, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true },
+        h('path', { d: 'M6.1 4.6 2.8 8l3.3 3.4M9.9 4.6 13.2 8l-3.3 3.4' }))
+    }
+
     /** Session-import glyph. */
     function ImportGlyph ({ size = 14 }) {
       const Icon = primitives === undefined
@@ -325,6 +364,8 @@ window.__ModuleLoader__.load({
         const [payload, setPayload] = React.useState(undefined)
         const [panels, setPanels] = React.useState([])
         const [menuOpen, setMenuOpen] = React.useState(false)
+        const [mode, setMode] = React.useState(() => readMode())
+        const [hasMode, setHasMode] = React.useState(() => mode !== null)
         const [scheme, setScheme] = React.useState(() => {
           try { return ctx.get('theme')?.getTheme().active.colorScheme ?? 'light' } catch (_error) { return 'light' }
         })
@@ -461,6 +502,40 @@ window.__ModuleLoader__.load({
             onSelect: (id) => { setMenuOpen(false); openPanel(id) },
           })
 
+        // The composer owns the mode switch and its session-opening flow, so the
+        // card mirrors its pressed state and activates the same buttons.
+        React.useEffect(() => {
+          const read = () => {
+            const next = readMode()
+            setMode(next)
+            setHasMode(next !== null)
+          }
+          read()
+          const observer = new MutationObserver(read)
+          observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['aria-pressed', 'class'] })
+          return () => observer.disconnect()
+        }, [])
+
+        const chooseMode = (index) => {
+          const buttons = document.querySelectorAll('.dpc-switch .dpc-seg')
+          const target = buttons[index]
+          if (target !== undefined) target.click()
+        }
+
+        const modeControl = hasMode
+          ? h('span', { className: 'dshb-mode', role: 'group' },
+            h('button', {
+              type: 'button', title: tr('modeChat'), 'aria-label': tr('modeChat'),
+              'data-active': mode === 'chat' ? 'true' : 'false',
+              onClick: () => chooseMode(0),
+            }, h(ChatGlyph)),
+            h('button', {
+              type: 'button', title: tr('modeCode'), 'aria-label': tr('modeCode'),
+              'data-active': mode === 'code' ? 'true' : 'false',
+              onClick: () => chooseMode(1),
+            }, h(CodeGlyph)))
+          : null
+
         const targetScheme = scheme === 'dark' ? 'light' : 'dark'
         const themeButton = h('button', {
           type: 'button', className: 'dshb-icon',
@@ -535,14 +610,14 @@ window.__ModuleLoader__.load({
           className: 'dshb-value',
           'data-muted': muted ? 'true' : 'false',
           'data-warn': !muted && low ? 'true' : 'false',
-        }, leading, moreControl)
+        }, leading, h('span', { className: 'dshb-tail' }, importButton, pluginsButton, themeButton, moreControl))
 
         return h('div', { className: 'dshb-root' },
           h('style', null, css),
           h('div', { className: 'dshb-card' },
             h('div', { className: 'dshb-top' },
               caption,
-              h('span', { className: 'dshb-tools' }, importButton, pluginsButton, themeButton, gear)),
+              h('span', { className: 'dshb-tools' }, modeControl, gear)),
             body))
       }
     }
