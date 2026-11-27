@@ -203,6 +203,11 @@ window.__ModuleLoader__.load({
       // The composer's chat/code switch moves onto this card.
       ':root:has(.dshb-card) .dpc-mode',
       '{display:none!important}',
+      // The chat plugin reserves 70px at the right of the workspace header for
+      // that fixed-position switch; with the switch gone the reservation would
+      // leave the section actions stranded in the middle, so release it.
+      ':root:has(.dshb-card) [data-sidebar-workspace-header] [class*="headerActions"]',
+      '{margin-right:0!important}',
       ':root:has(.dshb-card) [data-sidebar-scrollport] nav',
       '{display:none}',
 

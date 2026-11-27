@@ -278,3 +278,17 @@ dsh-balance/
 激活态用 `--dsw-alias-bg-skeleton` 做药丸底色（`bg-layer-2` 在浅色下是白色，等于没有）。
 实测：源控件隐藏、卡片分段存在且 `对话模式` 为 active、点击卡片 `写代码` 会转发到源按钮
 （用 click 间谍验证，没有真的触发建会话）。
+
+
+## 第八轮：工作区头部动作回到右边
+
+搬走 `dsh-plugin-chat` 的模式切换后，工作区头部那三个动作（搜索/视图/新建）挤到了中间。
+根因不是我的排版，而是那个插件给头部动作留了 `margin-right:70px` 给它的固定定位控件：
+
+```css
+[data-sidebar-workspace-header] [class*="headerActions"]{margin-right:70px !important}
+```
+
+控件被我隐藏后，这 70px 变成右侧空洞。修法是在卡片存在时释放这段预留：
+`:root:has(.dshb-card) [data-sidebar-workspace-header] [class*="headerActions"]{margin-right:0!important}`。
+实测计算样式 `margin-right: 0px`，动作右边界 271 / 头部右边界 276，回到右对齐。
